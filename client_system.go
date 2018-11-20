@@ -28,11 +28,12 @@ func (c Client) SystemInformation(ctx context.Context) (*SystemInformation, erro
 	}
 
 	si := new(SystemInformation)
-	if err := json.NewDecoder(resp.Body).Decode(si); err != nil {
+	eu := newEU(si)
+	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
 		return nil, err
 	}
 
-	return si, checkCSError(si.orError)
+	return si, checkCSError(eu.orError)
 }
 
 //ResourceUsage returns resource usage information on the system that is running container station.
@@ -56,11 +57,12 @@ func (c Client) ResourceUsage(ctx context.Context) (*ResourceUsage, error) {
 	}
 
 	ru := new(ResourceUsage)
-	if err := json.NewDecoder(resp.Body).Decode(ru); err != nil {
+	eu := newEU(ru)
+	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
 		return nil, err
 	}
 
-	return ru, checkCSError(ru.orError)
+	return ru, checkCSError(eu.orError)
 }
 
 type protocol int

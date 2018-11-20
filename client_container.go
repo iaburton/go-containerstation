@@ -1,10 +1,8 @@
 package containerstation
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 
 	"encoding/json"
 	"net/http"
@@ -55,29 +53,14 @@ func (c Client) ListContainers(ctx context.Context) ([]*Container, error) {
 		return nil, fmt.Errorf("containerstation: Unexpected http status code from container list (%d)", resp.StatusCode)
 	}
 
-	//TODO Is there any better way to do this outside of unmarshalling into interface{} or implementing unmarshal?
-	//Most CS endpoints have dynamically changing JSON which is a pain in a language like Go, but this one in particular
-	//has several return types instead of just two and the API docs give no indication as to all of the return types
-	//that are possible. The HTTP status code for every endpoint is also useless, it seems to be 200 no matter what.
-	var tmpBuf [10]byte
-	if _, err = io.ReadFull(resp.Body, tmpBuf[:]); err != nil {
-		return nil, err
-	}
-
 	var list []*Container
-	var cse orError
-	dec := json.NewDecoder(io.MultiReader(bytes.NewReader(tmpBuf[:]), resp.Body))
-	if bytes.Contains(tmpBuf[:], []byte("error")) {
-		err = dec.Decode(&cse)
-	} else {
-		err = dec.Decode(&list)
-	}
+	eu := newEU(&list)
 
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(eu); err != nil {
 		return nil, err
 	}
 
-	return list, checkCSError(cse)
+	return list, checkCSError(eu.orError)
 }
 
 type cType int

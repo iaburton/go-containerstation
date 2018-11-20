@@ -113,11 +113,12 @@ func (c Client) LoginRefresh(ctx context.Context) (*LoginResponse, error) {
 	}
 
 	lr := new(LoginResponse)
-	if err := json.NewDecoder(resp.Body).Decode(lr); err != nil {
+	eu := newEU(lr)
+	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
 		return nil, err
 	}
 
-	return lr, checkCSError(lr.orError)
+	return lr, checkCSError(eu.orError)
 }
 
 //Logout invalidates the session of the Client with the NAS if it has one. It should be called when work
@@ -142,9 +143,10 @@ func (c Client) Logout(ctx context.Context) (*LogoutResponse, error) {
 	}
 
 	lr := new(LogoutResponse)
-	if err := json.NewDecoder(resp.Body).Decode(lr); err != nil {
+	eu := newEU(lr)
+	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
 		return nil, err
 	}
 
-	return lr, checkCSError(lr.orError)
+	return lr, checkCSError(eu.orError)
 }

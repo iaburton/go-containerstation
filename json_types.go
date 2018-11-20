@@ -12,15 +12,11 @@ type LoginResponse struct {
 	IsAdmin   bool   `json:"isAdmin"`
 	Time      string `json:"loginime"`
 	Username  string `json:"username"`
-
-	orError
 }
 
 //LogoutResponse is the JSON returned for a logout request.
 type LogoutResponse struct {
 	Username string `json:"username"`
-
-	orError
 }
 
 //SystemInformation is the JSON returned for a system information request.
@@ -46,8 +42,6 @@ type SystemInformation struct {
 		Qpkg          string `json:"qpkg"`
 		Web           string `json:"web"`
 	} `json:"version"`
-
-	orError
 }
 
 //ResourceUsage is the JSON returned for a resource usage request.
@@ -62,8 +56,6 @@ type ResourceUsage struct {
 		Total          int `json:"total"`
 		Used           int `json:"used"`
 	} `json:"memory_usage"`
-
-	orError
 }
 
 //Container is the JSON returned when getting basic information on a container
