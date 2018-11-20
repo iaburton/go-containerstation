@@ -2,8 +2,6 @@ package containerstation
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -63,32 +61,13 @@ func (c Client) Login(ctx context.Context, user, pass string) (*LoginResponse, e
 	uv.Set("username", user)
 	uv.Set("password", pass)
 	req, err := http.NewRequest(http.MethodPost, *c.baseURL+apiEndpoint, strings.NewReader(uv.Encode()))
-	if err != nil {
-		return nil, err
-	}
+	i, err := c.boilerplateHTTP(ctx, req, err, loginResponseType, func(r *http.Request) {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	})
 
-	req = req.WithContext(ctx)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	//TODO any point in checking beyond 200?
-	//Seems containerstation only returns 200 regardless of what actually happened.
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("containerstation: Unexpected http status code from login (%d)", resp.StatusCode)
-	}
-
-	lr := new(LoginResponse)
-	eu := newEU(lr)
-	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
-		return nil, err
-	}
-
-	return lr, checkCSError(eu.orError)
+	//We know this will be the return type and is only nil on error
+	lr, _ := i.(*LoginResponse)
+	return lr, err
 }
 
 //LoginRefresh presumably refreshes the session belonging to this Client. Unfortunately the Container Station
@@ -97,28 +76,10 @@ func (c Client) LoginRefresh(ctx context.Context) (*LoginResponse, error) {
 	const apiEndpoint = `/containerstation/api/v1/login_refresh`
 
 	req, err := http.NewRequest(http.MethodGet, *c.baseURL+apiEndpoint, nil)
-	if err != nil {
-		return nil, err
-	}
+	i, err := c.boilerplateHTTP(ctx, req, err, loginResponseType, nil)
 
-	req = req.WithContext(ctx)
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("containerstation: Unexpected http status code from login_refresh (%d)", resp.StatusCode)
-	}
-
-	lr := new(LoginResponse)
-	eu := newEU(lr)
-	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
-		return nil, err
-	}
-
-	return lr, checkCSError(eu.orError)
+	lr, _ := i.(*LoginResponse)
+	return lr, err
 }
 
 //Logout invalidates the session of the Client with the NAS if it has one. It should be called when work
@@ -127,26 +88,8 @@ func (c Client) Logout(ctx context.Context) (*LogoutResponse, error) {
 	const apiEndpoint = `/containerstation/api/v1/logout`
 
 	req, err := http.NewRequest(http.MethodPut, *c.baseURL+apiEndpoint, nil)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
+	i, err := c.boilerplateHTTP(ctx, req, err, logoutResponseType, nil)
 
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("containerstation: Unexpected http status code from logout (%d)", resp.StatusCode)
-	}
-
-	lr := new(LogoutResponse)
-	eu := newEU(lr)
-	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
-		return nil, err
-	}
-
-	return lr, checkCSError(eu.orError)
+	lr, _ := i.(*LogoutResponse)
+	return lr, err
 }

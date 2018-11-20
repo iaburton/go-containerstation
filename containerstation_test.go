@@ -21,7 +21,7 @@ func ExampleNewClient() {
 
 	bg := context.Background()
 	log.Print("Login")
-	lr, err := cc.Login(bg, "stuff", "things")
+	lr, err := cc.Login(bg, user, pass)
 	if err != nil {
 		log.Fatalf("%T %v", err, err)
 	}
@@ -56,5 +56,14 @@ func ExampleNewClient() {
 		log.Panicf("%T %v", err, err)
 	}
 	log.Printf("Port 443 used: %v", used)
+
+	log.Print("ListContainers")
+	list, err := cc.ListContainers(bg)
+	if err != nil {
+		log.Panicf("%T %v", err, err)
+	}
+	for _, c := range list {
+		log.Printf("Container: %+v", c)
+	}
 	// Output:
 }

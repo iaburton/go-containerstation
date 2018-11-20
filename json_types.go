@@ -75,6 +75,10 @@ type Container struct {
 	Type      string   `json:"type"`
 }
 
+type networkPortUsed struct {
+	Used bool `json:"used"`
+}
+
 type errorUnmarshaler struct {
 	expected interface{}
 	orError

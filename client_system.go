@@ -2,7 +2,6 @@ package containerstation
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -12,28 +11,10 @@ func (c Client) SystemInformation(ctx context.Context) (*SystemInformation, erro
 	const apiEndpoint = `/containerstation/api/v1/system`
 
 	req, err := http.NewRequest(http.MethodGet, *c.baseURL+apiEndpoint, nil)
-	if err != nil {
-		return nil, err
-	}
+	i, err := c.boilerplateHTTP(ctx, req, err, sysInformationType, nil)
 
-	req = req.WithContext(ctx)
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("containerstation: Unexpected http status code from system (%d)", resp.StatusCode)
-	}
-
-	si := new(SystemInformation)
-	eu := newEU(si)
-	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
-		return nil, err
-	}
-
-	return si, checkCSError(eu.orError)
+	si, _ := i.(*SystemInformation)
+	return si, err
 }
 
 //ResourceUsage returns resource usage information on the system that is running container station.
@@ -41,28 +22,10 @@ func (c Client) ResourceUsage(ctx context.Context) (*ResourceUsage, error) {
 	const apiEndpoint = `/containerstation/api/v1/system/resource`
 
 	req, err := http.NewRequest(http.MethodGet, *c.baseURL+apiEndpoint, nil)
-	if err != nil {
-		return nil, err
-	}
+	i, err := c.boilerplateHTTP(ctx, req, err, resUsageType, nil)
 
-	req = req.WithContext(ctx)
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("containerstation: Unexpected http status code from resource usage (%d)", resp.StatusCode)
-	}
-
-	ru := new(ResourceUsage)
-	eu := newEU(ru)
-	if err := json.NewDecoder(resp.Body).Decode(eu); err != nil {
-		return nil, err
-	}
-
-	return ru, checkCSError(eu.orError)
+	ru, _ := i.(*ResourceUsage)
+	return ru, err
 }
 
 type protocol int
@@ -105,28 +68,11 @@ func (c Client) NetworkPort(ctx context.Context, proto protocol, port int) (bool
 	}
 
 	req, err := http.NewRequest(http.MethodGet, *c.baseURL+fmt.Sprintf(apiEndpoint, proto, port), nil)
-	if err != nil {
-		return false, err
-	}
+	i, err := c.boilerplateHTTP(ctx, req, err, npUsedType, nil)
 
-	req = req.WithContext(ctx)
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return false, err
+	var toReturn bool
+	if np, ok := i.(*networkPortUsed); ok {
+		toReturn = np.Used
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("containerstation: Unexpected http status code from network port (%d)", resp.StatusCode)
-	}
-
-	is := new(struct {
-		Used bool `json:"used"`
-		orError
-	})
-	if err := json.NewDecoder(resp.Body).Decode(is); err != nil {
-		return false, err
-	}
-
-	return is.Used, checkCSError(is.orError)
+	return toReturn, err
 }
