@@ -72,7 +72,7 @@ type Container struct {
 	State     string   `json:"state"`
 	TCPPort   []int    `json:"tcpPort"`
 	Tx        int      `json:"tx"`
-	Type      string   `json:"type"`
+	Type      cType    `json:"type"`
 }
 
 type networkPortUsed struct {
