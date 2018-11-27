@@ -1,8 +1,10 @@
 /*
 Package containerstation implements a Go API client for QNAP's ContainerStation API found here.
 
-http://qnap-dev.github.io/container-station-api/system.html
+http://qnap-dev.github.io/container-station-api/index.html
 
+The package name is just 'containerstation' not go-containerstation as the url/repo implies, and importing
+under a shorter alias such a cstation is recommended.
 Please note this package is a work in progress; more endpoints, tests and comments need to be added.
 A licence will be added and the package opensourced as it gets closer to an initial version/release.
 */

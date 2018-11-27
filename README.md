@@ -10,8 +10,10 @@
 ## <a name="pkg-overview">Overview</a>
 Package containerstation implements a Go API client for QNAP's ContainerStation API found here.
 
-<a href="http://qnap-dev.github.io/container-station-api/system.html">http://qnap-dev.github.io/container-station-api/system.html</a>
+<a href="http://qnap-dev.github.io/container-station-api/index.html">http://qnap-dev.github.io/container-station-api/index.html</a>
 
+The package name is just 'containerstation' not go-containerstation as the url/repo implies, and importing
+under a shorter alias such a cstation is recommended.
 Please note this package is a work in progress; more endpoints, tests and comments need to be added.
 A licence will be added and the package opensourced as it gets closer to an initial version/release.
 
@@ -68,7 +70,7 @@ const (
 
 
 
-## <a name="Client">type</a> [Client](/src/target/containerstation.go?s=756:817#L26)
+## <a name="Client">type</a> [Client](/src/target/containerstation.go?s=912:973#L28)
 ``` go
 type Client struct {
     // contains filtered or unexported fields
@@ -85,7 +87,7 @@ the various endpoints.
 
 
 
-### <a name="NewClient">func</a> [NewClient](/src/target/containerstation.go?s=1156:1210#L34)
+### <a name="NewClient">func</a> [NewClient](/src/target/containerstation.go?s=1312:1366#L36)
 ``` go
 func NewClient(baseURL string, hc *http.Client) Client
 ```
@@ -125,7 +127,7 @@ func (c Client) ListContainers(ctx context.Context) ([]*Container, error)
 
 
 
-### <a name="Client.Login">func</a> (Client) [Login](/src/target/containerstation.go?s=2117:2202#L65)
+### <a name="Client.Login">func</a> (Client) [Login](/src/target/containerstation.go?s=2273:2358#L67)
 ``` go
 func (c Client) Login(ctx context.Context, user, pass string) (*LoginResponse, error)
 ```
@@ -136,7 +138,7 @@ with access to Container Station.
 
 
 
-### <a name="Client.LoginRefresh">func</a> (Client) [LoginRefresh](/src/target/containerstation.go?s=2915:2988#L83)
+### <a name="Client.LoginRefresh">func</a> (Client) [LoginRefresh](/src/target/containerstation.go?s=3071:3144#L85)
 ``` go
 func (c Client) LoginRefresh(ctx context.Context) (*LoginResponse, error)
 ```
@@ -146,7 +148,7 @@ API docs don't explicitly state what this does, when or how often it should be c
 
 
 
-### <a name="Client.Logout">func</a> (Client) [Logout](/src/target/containerstation.go?s=3381:3449#L95)
+### <a name="Client.Logout">func</a> (Client) [Logout](/src/target/containerstation.go?s=3537:3605#L97)
 ``` go
 func (c Client) Logout(ctx context.Context) (*LogoutResponse, error)
 ```
