@@ -4,20 +4,14 @@ import (
 	"log"
 
 	"context"
-	"crypto/tls"
 	"net/http"
 
 	cstation "github.com/iaburton/containerstation"
 )
 
 func ExampleNewClient() {
-	cc := cstation.NewClient("https://Nasstorage", &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	})
+	//nil or any custom client can be passed
+	cc := cstation.NewClient("https://Nasstorage", http.DefaultClient)
 
 	bg := context.Background()
 	log.Print("Login")
